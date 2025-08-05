@@ -1,10 +1,7 @@
 package com.crossmint.polyantet;
 
 
-import com.crossmint.polyantet.models.AstralName;
 import com.crossmint.polyantet.models.AstralObject;
-import com.crossmint.polyantet.models.Cometh;
-import com.crossmint.polyantet.models.Polyanet;
 import com.crossmint.polyantet.service.ApiService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
@@ -14,23 +11,23 @@ import java.util.List;
 import java.util.Objects;
 
 @Slf4j
-public class POLYanetChallege {
+public class MegaverseChallege {
 
     public static void main(String[] args) {
 
         ApiService apiService = new ApiService();
         List<AstralObject> astralObjects = new ArrayList<>();
 
-        String[][] targetMap = null;
+        String[][] targetMap;
         try{
-            targetMap = apiService.getGoalMap();
+            targetMap = apiService.getMetaverseGoal();
         }catch (JsonProcessingException e){
             throw new RuntimeException(e);
         }
 
         for(int row = 0;row<targetMap.length;row++){
             for(int col = 0;col<targetMap.length;col++){
-                astralObjects.add(initAstralObject(targetMap[row][col],row,col));
+                astralObjects.add(AstralObject.createAstralObject(targetMap[row][col],row,col));
             }
         }
 
@@ -38,32 +35,16 @@ public class POLYanetChallege {
                 .filter(Objects::nonNull)
                 .forEach(obj ->{
                     int s = apiService.postAstralObject(obj);
-                    System.out.printf("Status code for request: %d\n",s);
+                    System.out.printf("Status code for %s %d %d request: %d\n",
+                            obj.getAstralName(),
+                            obj.getRow(),
+                            obj.getCol(),s);
                     try{
-                        Thread.sleep(750);
+                        Thread.sleep(300);
                     } catch (InterruptedException e) {
                         throw new RuntimeException(e);
                     }
                 });
-
-    }
-
-
-
-    public static AstralObject initAstralObject(String name, int row, int col){
-        if(name.equals(AstralName.POLYANET.name())){
-            return new Polyanet(row,col);
-        }
-
-        if(name.equals(AstralName.COMETH.name())){
-            return new Cometh(row,col);
-        }
-
-        if(name.equals(AstralName.SOLOON.name())){
-            return new Cometh(row,col);
-        }
-
-        return null;
 
     }
 

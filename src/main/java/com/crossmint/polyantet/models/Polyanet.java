@@ -2,12 +2,11 @@ package com.crossmint.polyantet.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 
 @Getter
 @AllArgsConstructor
-public class Polyanet extends AstralObject{
+public class Polyanet extends AstralObject {
+
     private final static AstralName astralName = AstralName.POLYANET;
 
     public Polyanet(int row, int col){
