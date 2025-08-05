@@ -1,4 +1,4 @@
-package com.crossmint.polyantet.service.request_body;
+package com.crossmint.megaverse.service.request_body;
 
 import lombok.Getter;
 

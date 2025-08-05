@@ -1,12 +1,12 @@
-package com.crossmint.polyantet.service;
+package com.crossmint.megaverse.service;
 
-import com.crossmint.polyantet.models.AstralObject;
-import com.crossmint.polyantet.models.Cometh;
-import com.crossmint.polyantet.models.Polyanet;
-import com.crossmint.polyantet.models.Soloon;
-import com.crossmint.polyantet.service.request_body.ColorRequestBody;
-import com.crossmint.polyantet.service.request_body.DirRequestBody;
-import com.crossmint.polyantet.service.request_body.RequestBody;
+import com.crossmint.megaverse.models.AstralObject;
+import com.crossmint.megaverse.models.Cometh;
+import com.crossmint.megaverse.models.Polyanet;
+import com.crossmint.megaverse.models.Soloon;
+import com.crossmint.megaverse.service.request_body.ColorRequestBody;
+import com.crossmint.megaverse.service.request_body.DirRequestBody;
+import com.crossmint.megaverse.service.request_body.RequestBody;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;

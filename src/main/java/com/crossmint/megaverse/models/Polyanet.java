@@ -1,4 +1,4 @@
-package com.crossmint.polyantet.models;
+package com.crossmint.megaverse.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,8 +1,8 @@
-package com.crossmint.polyantet;
+package com.crossmint.megaverse;
 
 
-import com.crossmint.polyantet.models.AstralObject;
-import com.crossmint.polyantet.service.ApiService;
+import com.crossmint.megaverse.models.AstralObject;
+import com.crossmint.megaverse.service.ApiService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 
