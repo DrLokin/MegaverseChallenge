@@ -1,4 +1,4 @@
-package com.crossmint.polyantet.models;
+package com.crossmint.megaverse.models;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,7 @@ import lombok.Setter;
 public abstract class AstralObject {
 
     //Basic fields that all AstralObject should have.
-    int row,col;
+    private int row,col;
 
     //Each subclass will define which enum it will use as a name.
     public abstract AstralName getAstralName();
