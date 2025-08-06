@@ -1,4 +1,4 @@
-# POLYanetChallenge
+# MegaverseChallenge
 
 ### Introduction
 The code I present here is a working solution to Phase 1 and 2 of the Crossmint megaverse challenge.
