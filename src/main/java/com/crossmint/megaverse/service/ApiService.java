@@ -1,12 +1,12 @@
-package com.crossmint.polyantet.service;
+package com.crossmint.megaverse.service;
 
-import com.crossmint.polyantet.models.AstralObject;
-import com.crossmint.polyantet.models.Cometh;
-import com.crossmint.polyantet.models.Polyanet;
-import com.crossmint.polyantet.models.Soloon;
-import com.crossmint.polyantet.service.request_body.ColorRequestBody;
-import com.crossmint.polyantet.service.request_body.DirRequestBody;
-import com.crossmint.polyantet.service.request_body.RequestBody;
+import com.crossmint.megaverse.models.AstralObject;
+import com.crossmint.megaverse.models.Cometh;
+import com.crossmint.megaverse.models.Polyanet;
+import com.crossmint.megaverse.models.Soloon;
+import com.crossmint.megaverse.service.request_body.ColorRequestBody;
+import com.crossmint.megaverse.service.request_body.DirRequestBody;
+import com.crossmint.megaverse.service.request_body.RequestBody;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -62,16 +62,17 @@ public class ApiService {
 
     //Method for generating and handling POST and DELETE requests
     private int requestAstralObject(AstralObject astralObj, HttpMethod method){
-        ResponseEntity<Void> response;
+        ResponseEntity<?> response = null;
         String url = rootUrl+astralObj.getAstralName().getUrlSuffix();
         HttpEntity<?> entity = resolveHttpEntity(astralObj);
 
         try{
-            response = initAstralObjectRequest(url,method,entity);
+            response = initAstralObjectRequest(url,method,entity,response);
             return response.getStatusCode().value();
         }catch (HttpClientErrorException e){
             System.out.println(e.getMessage());
-            return handle400StatusErrorsAndAbove(e,url,method,entity);
+            response = handle400StatusErrorsAndAbove(e,response,url,method,entity);
+            return (Objects.nonNull(response))?response.getStatusCode().value():400;
         }
     }
 
@@ -128,30 +129,31 @@ public class ApiService {
                 String goalUrl = responseHeaders.getFirst(HttpHeaders.LOCATION);
 
                 if (goalUrl != null){
-                    response = restTemplate.exchange(goalUrl,method,null, String.class);
+                    response = restTemplate.exchange(goalUrl,method,entity, String.class);
                 }
 
             }
             return mapper.readValue(response.getBody(), MegaverseMap.class).getGoal();
         }catch (HttpClientErrorException e){
             System.out.println(e.getMessage());
-            assert response != null;
-            if(handle400StatusErrorsAndAbove(e,goalURL,method,entity)!=200){
+            response = (ResponseEntity<String>) handle400StatusErrorsAndAbove(e,response,goalURL,method,entity);
+            if(Objects.nonNull(response) && response.getStatusCode().value()!=200){
                 return new String[0][0];
             }
+            assert response != null;
             return mapper.readValue(response.getBody(), MegaverseMap.class).getGoal();
         }
     }
 
-    //Method for initiating the the request and handling potential re-directs
-    private ResponseEntity<Void> initAstralObjectRequest(String url,HttpMethod method,HttpEntity<?> entity){
+    //Method for initiating the request and handling potential re-directs
+    private ResponseEntity<?> initAstralObjectRequest(String url,HttpMethod method,HttpEntity<?> entity,ResponseEntity<?> response){
 
         //Initial attempt at calling the API.
-        ResponseEntity<Void> response = restTemplate
+        response = restTemplate
                 .exchange(url,
                         method,
                         entity,
-                        Void.class
+                        Void.class,String.class
                 );
 
         //Handling redirect response by extracting the new URL and calling the API with it.
@@ -164,7 +166,7 @@ public class ApiService {
                         .exchange(url,
                                 method,
                                 entity,
-                                Void.class
+                                Void.class,String.class
                         );
             }
 
@@ -174,8 +176,8 @@ public class ApiService {
     }
 
     //Method for handling API request errors.
-    private int handle400StatusErrorsAndAbove(HttpClientErrorException err, String url,HttpMethod method,HttpEntity<?> entity) {
-        ResponseEntity<?> response = null;
+    private ResponseEntity<?> handle400StatusErrorsAndAbove(HttpClientErrorException err,ResponseEntity<?> response,
+                                              String url,HttpMethod method,HttpEntity<?> entity) {
 
         //Handling bad request errors.
         //Specifically the 429 by retrying the request after a delay for a number of times.
@@ -187,14 +189,14 @@ public class ApiService {
                     for(int i = 0;i<maxRetry;i++){
                         System.out.printf("Trying again after %d milliseconds.\n", wait);
                         Thread.sleep(wait);
-                        response = initAstralObjectRequest(url,method,entity);
+                        response = initAstralObjectRequest(url,method,entity,response);
                         if(response.getStatusCode().is2xxSuccessful()){
-                            return response.getStatusCode().value();
+                            return response;
                         }
                     }
                 }catch (InterruptedException|HttpClientErrorException e){
                     System.out.println(e.getMessage());
-                    return (e instanceof HttpClientErrorException er)?er.getStatusCode().value():400;
+                    return (e instanceof HttpClientErrorException er)?new ResponseEntity<>(er.getStatusCode()):null;
                 }
             }else{
                 System.out.println("Consider checking the request URL, body, or headers.");
@@ -203,12 +205,11 @@ public class ApiService {
 
 
         //Handling internal server errors.
-        if(Objects.nonNull(response) && response.getStatusCode().is5xxServerError()){
+        if(err.getStatusCode().is5xxServerError()){
             System.out.println("Consider double-checking the candidate ID.");
-            return response.getStatusCode().value();
         }
 
-        return err.getStatusCode().value();
+        return new ResponseEntity<>(err.getStatusCode());
     }
 
 
