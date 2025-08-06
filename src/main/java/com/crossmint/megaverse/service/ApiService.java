@@ -128,7 +128,7 @@ public class ApiService {
                 String goalUrl = responseHeaders.getFirst(HttpHeaders.LOCATION);
 
                 if (goalUrl != null){
-                    response = restTemplate.exchange(goalUrl,method,null, String.class);
+                    response = restTemplate.exchange(goalUrl,method,entity, String.class);
                 }
 
             }
